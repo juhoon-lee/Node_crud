@@ -45,8 +45,8 @@ var app = http.createServer(function (request, response) {
 							if (error) {
 								throw error;
 							}
-							const comentList = template.Cmlist(comments);
-							const html = template.LoginShowBoard(boards, comentList);
+							const comentList = template.Cmlist(comments, author);
+							const html = template.LoginShowBoard(boards, comentList, author);
 							response.writeHead(200);
 							response.end(html);
 						}
@@ -61,7 +61,7 @@ var app = http.createServer(function (request, response) {
 							if (error) {
 								throw error;
 							}
-							const comentList = template.Cmlist(comments);
+							const comentList = template.Cmlist(comments, author);
 							const html = template.ShowBoard(boards, comentList);
 							response.writeHead(200);
 							response.end(html);
@@ -200,18 +200,13 @@ var app = http.createServer(function (request, response) {
 		});
 		request.on('end', function () {
 			var post = qs.parse(body);
-			if (post.author === author) {
-				db.query('DELETE FROM board WHERE id=?', [post.id], function (error, result) {
-					if (error) {
-						throw error;
-					}
-					response.writeHead(302, { Location: `/` });
-					response.end();
-				});
-			} else {
-				response.writeHead(302, { Location: `/?id=${post.id}` });
+			db.query('DELETE FROM board WHERE id=?', [post.id], function (error, result) {
+				if (error) {
+					throw error;
+				}
+				response.writeHead(302, { Location: `/` });
 				response.end();
-			}
+			});
 		});
 	} else if (pathname === '/comment_process') {
 		var body = '';
@@ -228,6 +223,52 @@ var app = http.createServer(function (request, response) {
 						throw error;
 					}
 					response.writeHead(302, { Location: `/?id=${post.id}` });
+					response.end();
+				}
+			);
+		});
+	} else if (pathname === '/comment_delete') {
+		var body = '';
+		request.on('data', function (data) {
+			body = body + data;
+		});
+		request.on('end', function () {
+			var post = qs.parse(body);
+			const aftermove = post.board_id;
+			db.query('DELETE FROM comment WHERE id=?', [post.id], function (error, result) {
+				if (error) {
+					throw error;
+				}
+				response.writeHead(302, { Location: `/?id=${aftermove}` });
+				response.end();
+			});
+		});
+	} else if (pathname === '/comment_update') {
+		var body = '';
+		request.on('data', function (data) {
+			body = body + data;
+		});
+		request.on('end', function () {
+			var post = qs.parse(body);
+			const html = template.CommentUpdate(post);
+			response.writeHead(200);
+			response.end(html);
+		});
+	} else if (pathname === '/comment_update_process') {
+		var body = '';
+		request.on('data', function (data) {
+			body = body + data;
+		});
+		request.on('end', function () {
+			var post = qs.parse(body);
+			db.query(
+				'UPDATE comment SET comment=? WHERE id=?',
+				[post.comment, post.id],
+				function (error, result) {
+					if (error) {
+						throw error;
+					}
+					response.writeHead(302, { Location: `/?id=${post.board_id}` });
 					response.end();
 				}
 			);
