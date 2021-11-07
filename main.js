@@ -5,8 +5,8 @@ var template = require('./lib/template.js');
 var mysql = require('mysql');
 var db = mysql.createConnection({
 	host: 'localhost',
-	user: 'root',
-	password: 'ju990120',
+	user: 'webgrus',
+	password: 'ju8334',
 	database: 'webgrus',
 });
 db.connect();
@@ -131,7 +131,7 @@ var app = http.createServer(function (request, response) {
 			);
 		});
 	} else if (pathname === '/create') {
-		const html = template.Create();
+		const html = template.Create(author);
 		response.writeHead(200);
 		response.end(html);
 	} else if (pathname === '/create_process') {
@@ -150,7 +150,6 @@ var app = http.createServer(function (request, response) {
 					if (error) {
 						throw error;
 					}
-					console.log(author);
 					response.writeHead(302, { Location: `/?id=${result.insertId}` });
 					response.end();
 				}
@@ -278,4 +277,4 @@ var app = http.createServer(function (request, response) {
 		response.end('Not found');
 	}
 });
-app.listen(3000);
+app.listen(8080);
