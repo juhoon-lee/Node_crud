@@ -1,5 +1,5 @@
 var mysql = require('mysql');
-// 비밀번호는 별도의 파일로 분리해서 버전관리에 포함시키지 않아야 합니다.
+// 비밀번호는 별도의 파일로 분리해서 버전관리에 포함시키지 않아야 합니다.(현재 미사용 데이터베이스)
 var connection = mysql.createConnection({
 	host: 'localhost',
 	user: 'nodejs',
